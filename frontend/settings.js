@@ -16,6 +16,7 @@ export const ConfigKeys = Object.freeze({
   TABLE_ID: 'tableId',
   VIEW_ID: 'viewId',
   ASSIGNMENT_FIELD_ID: 'assignmentFieldId',
+  GROUP_FIELD_ID: 'groupFieldId'
 });
 
 /**
@@ -24,7 +25,8 @@ export const ConfigKeys = Object.freeze({
  *  settings: {
  *      table: Table | null,
  *      view: View | null,
- *      field: Field | null,
+ *      assignmentField: Field | null,
+ *      groupField: Field | null
  *  },
  *  areSettingsValid: boolean,
  *  message?: string}}
@@ -35,26 +37,38 @@ export function useSettings() {
 
   const table = base.getTableByIdIfExists(globalConfig.get(ConfigKeys.TABLE_ID));
   const view = table ? table.getViewByIdIfExists(globalConfig.get(ConfigKeys.VIEW_ID)) : null;
-  const field = table
-  ? table.getFieldByIdIfExists(globalConfig.get(ConfigKeys.ASSIGNMENT_FIELD_ID))
-  : null;
+  const assignmentField = table
+    ? table.getFieldByIdIfExists(globalConfig.get(ConfigKeys.ASSIGNMENT_FIELD_ID))
+    : null;
+
+  const groupField = table
+    ? table.getFieldByIdIfExists(globalConfig.get(ConfigKeys.GROUP_FIELD_ID))
+    : null;
 
   const settings = {
-  table,
-  view,
-  field,
+    table,
+    view,
+    assignmentField,
+    groupField
   };
 
-  if (!table || !view || !field || field.type != FieldType.MULTIPLE_RECORD_LINKS) {
-  return {
-    areSettingsValid: false,
-    message: 'Pick a table, view, and assignment field', // TODO could make this more specific about what's wrong?
-    settings,
-  };
+  const invalid = (message) => {
+    return {
+      areSettingsValid: false,
+      message: message,
+      settings,
+    };
   }
+
+  if (!table) return invalid('Pick the table with the people you want to assign');
+  if (!view) return invalid('Pick the view with the people you want to assign');
+  if (!assignmentField) return invalid('Pick a field to save assignments');
+  if (assignmentField.type != FieldType.MULTIPLE_RECORD_LINKS) return invalid('Assignment field must be a link field');
+  if (groupField && groupField.type != FieldType.SINGLE_SELECT) return invalid('Group field must be a single select field');
+
   return {
-  areSettingsValid: true,
-  settings,
+    areSettingsValid: true,
+    settings,
   };
 }
 
@@ -94,12 +108,22 @@ export function SettingsForm({setIsSettingsVisible, settings}) {
             </FormField>
             <FormField 
               label="Assignment field"
-              description="Where to store the gift-giving assignments"
+              description="Where to store the gift-giving assignments. Hint: hide this column if you want to keep the assignments a secret, even from yourself!"
             >
               <FieldPickerSynced
                 table={settings.table}
                 globalConfigKey={ConfigKeys.ASSIGNMENT_FIELD_ID}
                 allowedTypes={[FieldType.MULTIPLE_RECORD_LINKS]}
+              />
+            </FormField>
+            <FormField 
+              label="Group field (optional)"
+              description="People in the same group won't be assigned to each other"
+            >
+              <FieldPickerSynced
+                table={settings.table}
+                globalConfigKey={ConfigKeys.GROUP_FIELD_ID}
+                allowedTypes={[FieldType.SINGLE_SELECT]}
               />
             </FormField>
           </>

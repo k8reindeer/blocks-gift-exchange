@@ -20,9 +20,14 @@ export function Visualizer({settings}) {
 		return null;
 	}
 	for (let r of records) {
-		elements.push({data: { id: r.id, label: r.name, family: r.getCellValue('Family').id }})
+		let nodeData = { id: r.id, label: r.name }
+		if (settings.groupField) {
+			// Mark which group for color coding if groups are being used
+			nodeData['group'] = r.getCellValue(settings.groupField.id).id;
+		}
+		elements.push({data: nodeData})
 
-		const assignments = r.getCellValue(settings.field.id);
+		const assignments = r.getCellValue(settings.assignmentField.id);
 		if (!assignments) {
 			continue;
 		}
@@ -57,15 +62,16 @@ export function Visualizer({settings}) {
       }
     }
   ]
-
-  const field = settings.table.getField('Family');
-  for (let choice of field.options.choices) {
-  	style.push({
-  		selector: `[family="${choice.id}"]`,
-  		style: {
-  			'background-color': colorUtils.getHexForColor(choice.color)
-  		}
-  	})
+  if (settings.groupField) {
+  	// Style groups by their color if groups are being used
+  	for (let choice of settings.groupField.options.choices) {
+	  	style.push({
+	  		selector: `[group="${choice.id}"]`,
+	  		style: {
+	  			'background-color': colorUtils.getHexForColor(choice.color)
+	  		}
+	  	})
+	  }
   }
 
   const layout = { name: 'avsdf', handleDisconnected: true, randomize: false, prelayout: { name: 'cola' }};

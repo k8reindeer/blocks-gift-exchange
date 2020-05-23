@@ -1,10 +1,12 @@
-import {initializeBlock, Box, Button, Text, useRecords, useSettingsButton} from '@airtable/blocks/ui';
+import {initializeBlock, Box, Button, ConfirmationDialog, Text, useRecords, useSettingsButton} from '@airtable/blocks/ui';
 import React, {useEffect, useState} from 'react';
 import {Visualizer} from './visualizer';
 import {useSettings, SettingsForm} from './settings';
 
 
 function MatchMaker({settings}) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	async function makeMatch() {
 		const records = (await settings.view.selectRecordsAsync()).records;
 
@@ -16,7 +18,7 @@ function MatchMaker({settings}) {
 			return {
 				id: this_id,
 				fields: {
-					[settings.field.id]: [{id: next_id}],
+					[settings.assignmentField.id]: [{id: next_id}],
 				}
 			}
 		});
@@ -33,8 +35,7 @@ function MatchMaker({settings}) {
 			return [];
 		}
 		for (const r of records) {
-			// make this field configurable)
-			const assignments = r.getCellValue(settings.field.id);
+			const assignments = r.getCellValue(settings.assignmentField.id);
 			// Make sure I'm giving to someone
 			if (!assignments || assignments.length == 0) {
 				warnings.push(`${r.name} isn't assigned to give to anyone`);
@@ -50,19 +51,22 @@ function MatchMaker({settings}) {
 			if (assignments.length > 1) {
 				warnings.push(`${r.name} is assigned to give to multiple people`);
 			} else {
-				// Make sure I'm not giving to someone in my family
 				const assignmentId = assignments[0].id;
 				if (assignmentId === r.id) {
 					warnings.push(`${r.name} is assigned to themself!`);
 				}
-				const assignment = records.find((x) => x.id === assignmentId)
-				const myFamily = r.getCellValue("Family"); // genericize this as a group column
-				if (myFamily.id === assignment.getCellValue("Family").id) {
-					warnings.push(`${r.name} is assigned to ${assignment.name} but they're both in group ${myFamily.name}`);
+				
+				if (settings.groupField) {
+					// If there's a group field set up, make sure I'm not giving to someone in my group, 
+					const assignment = records.find((x) => x.id === assignmentId)
+					const myGroup = r.getCellValue(settings.groupField.id);
+					if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
+						warnings.push(`${r.name} is assigned to ${assignment.name} but they're both in group ${myGroup.name}`);
+					}
 				}
 			}
-			
 		}
+
 		for (const r of records) {
 			if (!(r.id in reverseLookup)) {
 				warnings.push(`Nobody is assigned to give to ${r.name}`)
@@ -84,7 +88,14 @@ function MatchMaker({settings}) {
 
 	return (<Box display="flex" flexDirection="row" flex="auto"> 
 		<Box flex="1">
-			<Button onClick={makeMatch} icon="share" variant="primary">
+			<Button icon="share" variant="primary" onClick={() => {
+				if (allWarnings.length === 0) {
+					// If there are no warnings, confirm before throwing out a successful match.
+					setIsDialogOpen(true);
+				} else {
+					makeMatch();
+				}
+			}}>
 	    	Make Match
 	  	</Button>
 			{allWarnings.length == 0 ? 
@@ -97,6 +108,17 @@ function MatchMaker({settings}) {
 	  <Box flex="2">
 	  	<Visualizer settings={settings}/>
 	  </Box>
+    {isDialogOpen && (
+      <ConfirmationDialog
+        title="Are you sure?"
+        body="This will throw out your current match"
+        onConfirm={() => {
+        	makeMatch();
+          setIsDialogOpen(false);
+        }}
+        onCancel={() => setIsDialogOpen(false)}
+      />
+    )}
 	</Box>)
 }
 
@@ -144,12 +166,11 @@ initializeBlock(() => <SecretSantaBlock />);
 
 // # Functional
 
-// factor "family" column into a "group" setting
-// - And make sure it's a single select, can only be in 1 family
-
 // better matching algorithm
 // - no warnings, by default
 // - make it animate gradually as the assignments get made
+
+// tooltip about hiding the assignment column
 
 // # Cleanup
 
