@@ -2,11 +2,14 @@ import {
 	initializeBlock,
 	Box,
 	Button,
+	ChoiceToken,
 	colorUtils,
 	colors,
 	ConfirmationDialog,
+	expandRecord,
 	Icon,
 	Text,
+	TextButton,
 	useRecords,
 	useSettingsButton
 } from '@airtable/blocks/ui';
@@ -16,6 +19,14 @@ import {useSettings, SettingsForm} from './settings';
 import {loadCSSFromURLAsync} from '@airtable/blocks/ui';
 
 loadCSSFromURLAsync("https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css");
+
+function RecordLink({record}) {
+	return (
+		<TextButton onClick={() => expandRecord(record)}>
+	    {record.name}
+	  </TextButton>
+	)
+}
 
 function SuccessMessage({settings}) {
   return (<>
@@ -27,10 +38,42 @@ function SuccessMessage({settings}) {
 			fillColor={colorUtils.getHexForColor(colors.RED)} 
 		/>
 		<Text textAlign="center"> 
-			Success! A perfect gift assignment is stored in the 
-			<strong>{settings.assignmentField.name}</strong> field! 
+			Success! A perfect gift assignment is stored in the <strong>{settings.assignmentField.name}</strong> field! 
 		</Text> 
 	</>)
+}
+
+function Warnings({warnings}) {
+	return(
+		<Box
+		  flex="auto"
+		  display="flex"
+		  flexDirection="column"
+		  minHeight="0"
+		  alignItems="flex-start">
+  	<Text> 
+  		<Icon name="warning" size={16} marginX={2} fillColor={colorUtils.getHexForColor(colors.YELLOW_BRIGHT)}  />
+  		There are {warnings.length} issues 
+  	</Text>
+  	<Box
+  		marginY={2}
+  		overflowY="scroll"
+		  maxHeight="100vh"
+		  backgroundColor="lightGray3">
+	  	{warnings.map((w, i) => {
+	  		return (
+	  			<Box
+	  				key={i}
+	  				margin={2}
+	  				padding={1}
+	  				borderRadius={2}
+	  				backgroundColor="white">
+	  				<Text> {w} </Text>
+	  			</Box>
+	  		)
+	  	})}
+  	</Box>
+	</Box>)
 }
 
 
@@ -68,7 +111,7 @@ function MatchMaker({settings}) {
 			const assignments = r.getCellValue(settings.assignmentField.id);
 			// Make sure I'm giving to someone
 			if (!assignments || assignments.length == 0) {
-				warnings.push(`${r.name} isn't assigned to give to anyone`);
+				warnings.push(<><RecordLink record={r}/> isn't assigned to give to anyone </>);
 				continue;
 			}
 
@@ -79,19 +122,19 @@ function MatchMaker({settings}) {
 				reverseLookup[a.id].push(r.id);
 			}
 			if (assignments.length > 1) {
-				warnings.push(`${r.name} is assigned to give to multiple people`);
+				warnings.push(<><RecordLink record={r}/> is assigned to give to multiple people </>);
 			} else {
 				const assignmentId = assignments[0].id;
 				if (assignmentId === r.id) {
-					warnings.push(`${r.name} is assigned to themself!`);
-				}
-				
-				if (settings.groupField) {
+					warnings.push(<><RecordLink record={r}/> is assigned to themself!</>);
+				} else if (settings.groupField) {
 					// If there's a group field set up, make sure I'm not giving to someone in my group, 
 					const assignment = records.find((x) => x.id === assignmentId)
 					const myGroup = r.getCellValue(settings.groupField.id);
 					if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
-						warnings.push(`${r.name} is assigned to ${assignment.name} but they're both in group ${myGroup.name}`);
+						warnings.push(<>
+							<RecordLink record={r}/> is assigned to <RecordLink record={assignment}/> but they're both in group <ChoiceToken choice={myGroup}/>
+						</>);
 					}
 				}
 			}
@@ -99,14 +142,14 @@ function MatchMaker({settings}) {
 
 		for (const r of records) {
 			if (!(r.id in reverseLookup)) {
-				warnings.push(`Nobody is assigned to give to ${r.name}`)
+				warnings.push(<>Nobody is assigned to give to <RecordLink record={r}/></> )
 			}
 		// everyone is giving to a different person, every person will receive 1 gift
 		}
 		for (const [recipientId, givers] of Object.entries(reverseLookup)) {
 			if (givers.length > 1) {
 				const recipient = records.find((x) => x.id === recipientId)
-				warnings.push(`${givers.length} people are assigned to give to ${recipient.name}`)
+				warnings.push(<>{givers.length} people are assigned to give to <RecordLink record={recipient}/> </>)
 			}
 		}
 
@@ -148,16 +191,9 @@ function MatchMaker({settings}) {
 				<Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch}>
 		    	Make Match
 		  	</Button>
-				{allWarnings.length == 0 ? <SuccessMessage settings={settings}/> :
-			  	<>
-				  	<Icon name="warning" size={16} fillColor={colorUtils.getHexForColor(colors.YELLOW_BRIGHT)}  />
-				  	<Text> There are {allWarnings.length} issues </Text>
-				  	<ul>
-				  	{allWarnings.map((w, i) => {
-				  		return <li key={i}> {w} </li>
-				  	})}
-				  	</ul>
-			  	</>
+				{allWarnings.length == 0 ? 
+					<SuccessMessage settings={settings}/> :
+					<Warnings warnings={allWarnings}/>
 			  }
 			</Box>
 		</Box>
