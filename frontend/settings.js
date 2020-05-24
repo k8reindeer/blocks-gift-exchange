@@ -5,7 +5,9 @@ import {
   FieldPickerSynced,
   FormField,
   Heading,
+  Icon,
   TablePickerSynced,
+  Tooltip,
   ViewPickerSynced,
   useBase,
   useGlobalConfig
@@ -108,8 +110,16 @@ export function SettingsForm({setIsSettingsVisible, settings}) {
             </FormField>
             <FormField 
               label="Assignment field"
-              description="Where to store the gift-giving assignments. Hint: hide this column if you want to keep the assignments a secret, even from yourself!"
+              description="Where to store the gift-giving assignments."
             >
+              <Tooltip
+                content="Hint: hide this field if you want to keep assignments secret, even from yourself!"
+                placementX={Tooltip.placements.CENTER}
+                placementY={Tooltip.placements.BOTTOM}
+                shouldHideTooltipOnClick={true}
+              >
+                <Icon name="info" aria-label="Hint: hide this field if you want to keep assignments secret, even from yourself!" />
+              </Tooltip>
               <FieldPickerSynced
                 table={settings.table}
                 globalConfigKey={ConfigKeys.ASSIGNMENT_FIELD_ID}

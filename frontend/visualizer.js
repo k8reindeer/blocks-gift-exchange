@@ -87,7 +87,7 @@ export function Visualizer({settings}) {
   			})
   			layoutInstance = cy.makeLayout(layout);
   		}} 
-  		style={ { width: '100%', height: '400px' } }  
+  		style={ { height: '400px' } }  
   		stylesheet={style}
   	/>
   </>)

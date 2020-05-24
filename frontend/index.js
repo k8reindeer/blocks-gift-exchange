@@ -1,7 +1,37 @@
-import {initializeBlock, Box, Button, ConfirmationDialog, Text, useRecords, useSettingsButton} from '@airtable/blocks/ui';
+import {
+	initializeBlock,
+	Box,
+	Button,
+	colorUtils,
+	colors,
+	ConfirmationDialog,
+	Icon,
+	Text,
+	useRecords,
+	useSettingsButton
+} from '@airtable/blocks/ui';
 import React, {useEffect, useState} from 'react';
 import {Visualizer} from './visualizer';
 import {useSettings, SettingsForm} from './settings';
+import {loadCSSFromURLAsync} from '@airtable/blocks/ui';
+
+loadCSSFromURLAsync("https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css");
+
+function SuccessMessage({settings}) {
+  return (<>
+		<Icon 
+			className="animate__animated animate__tada" 
+			name="gift" 
+			margin={3} 
+			size={64} 
+			fillColor={colorUtils.getHexForColor(colors.RED)} 
+		/>
+		<Text textAlign="center"> 
+			Success! A perfect gift assignment is stored in the 
+			<strong>{settings.assignmentField.name}</strong> field! 
+		</Text> 
+	</>)
+}
 
 
 function MatchMaker({settings}) {
@@ -83,29 +113,55 @@ function MatchMaker({settings}) {
 		return warnings;
 	}
 
+	function safeMakeMatch() {
+		if (allWarnings.length === 0) {
+			// If there are no warnings, confirm before throwing out a successful match.
+			setIsDialogOpen(true);
+		} else {
+			makeMatch();
+		}
+	}
+
 	// yes we do want this to go on every rerender
 	const allWarnings = validateMatch();
 
-	return (<Box display="flex" flexDirection="row" flex="auto"> 
-		<Box flex="1">
-			<Button icon="share" variant="primary" onClick={() => {
-				if (allWarnings.length === 0) {
-					// If there are no warnings, confirm before throwing out a successful match.
-					setIsDialogOpen(true);
-				} else {
-					makeMatch();
-				}
-			}}>
-	    	Make Match
-	  	</Button>
-			{allWarnings.length == 0 ? 
-		  	<p> All set, everything's good! </p> :
-		  	allWarnings.map((w, i) => {
-		  		return <p key={i}> {w} </p>
-		  	})
-		  }
+	return (<Box display="flex" flex="auto" alignItems="flex-start" justifyContent="center">
+		<Box 
+			flex="none"
+      display="flex"
+      flexDirection="column"
+      width="200px"
+      backgroundColor="white"
+      height="100%"
+      maxHeight="100vh"
+      borderRight="thick"
+		>
+		  <Box
+        flex="auto"
+        display="flex"
+        flexDirection="column"
+        minHeight="0"
+        padding={3}
+        overflowY="auto"
+        alignItems="center"
+      >
+				<Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch}>
+		    	Make Match
+		  	</Button>
+				{allWarnings.length == 0 ? <SuccessMessage settings={settings}/> :
+			  	<>
+				  	<Icon name="warning" size={16} fillColor={colorUtils.getHexForColor(colors.YELLOW_BRIGHT)}  />
+				  	<Text> There are {allWarnings.length} issues </Text>
+				  	<ul>
+				  	{allWarnings.map((w, i) => {
+				  		return <li key={i}> {w} </li>
+				  	})}
+				  	</ul>
+			  	</>
+			  }
+			</Box>
 		</Box>
-	  <Box flex="2">
+	  <Box flex="auto">
 	  	<Visualizer settings={settings}/>
 	  </Box>
     {isDialogOpen && (
@@ -159,10 +215,17 @@ initializeBlock(() => <SecretSantaBlock />);
 
 // # Visual
 
-// Group the warnings, make them a lot prettier. 
-// Make it funner when everything has worked!
+// Group the warnings??, make them a lot prettier. 
+// warning bullet styling
+// warning icon styling
+// refactor warnings
 // Layout -- make the nodes/labels big, but buttons laid out on the side with good margins
+// ability to hide visualization if you want to keep it a secret
 // make layout work with settings open or closed even as viewport changes
+// make it shake every time a new good one is found, not just the first time.
+// make it animate on hover
+// make tooltip actually look good
+
 
 // # Functional
 
@@ -170,7 +233,6 @@ initializeBlock(() => <SecretSantaBlock />);
 // - no warnings, by default
 // - make it animate gradually as the assignments get made
 
-// tooltip about hiding the assignment column
 
 // # Cleanup
 
