@@ -1,4 +1,6 @@
 import {Box, Button, expandRecord, useRecords, colorUtils, useViewport} from '@airtable/blocks/ui';
+import {useSettings} from './settings';
+
 import cytoscape from 'cytoscape';
 import avsdf from 'cytoscape-avsdf';
 
@@ -11,7 +13,8 @@ import CytoscapeComponent from 'react-cytoscapejs';
 
 cytoscape.use( avsdf );
 
-export function Visualizer({settings}) {
+export function Visualizer() {
+  const {settings} = useSettings();
 	const records = useRecords(settings.view);
 	const viewport = useViewport();
 	var layoutInstance;

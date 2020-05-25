@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Box,
   Button,
@@ -9,7 +9,8 @@ import {
   TablePickerSynced,
   ViewPickerSynced,
   useBase,
-  useGlobalConfig
+  useGlobalConfig,
+  useSettingsButton
 } from '@airtable/blocks/ui';
 import {FieldType} from '@airtable/blocks/models';
 
@@ -73,10 +74,39 @@ export function useSettings() {
   };
 }
 
-export function SettingsForm({closeSettings, settingsLeaving, settings}) {
-  const direction = settingsLeaving ? "Out" : "In"
-  const classes = `animate__animated animate__slide${direction}Right`
-  return (
+export function SettingsForm() {
+  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+  const [settingsLeaving, setSettingsLeaving] = useState(false);
+  const {areSettingsValid, settings} = useSettings();
+
+  // Open the SettingsForm whenever the settings are not valid
+  useEffect(() => {
+    if (!areSettingsValid) {
+      setIsSettingsVisible(true);
+    }
+  }, [areSettingsValid]);
+
+  // Animate the settings pane when it closes
+  function closeSettings() {
+    setSettingsLeaving(true);
+    setTimeout(() => {
+      setIsSettingsVisible(false);
+      setSettingsLeaving(false);
+    }, 1000)
+  }
+
+  useSettingsButton(() => {
+    if (isSettingsVisible) {
+      closeSettings();
+    } else {
+      setIsSettingsVisible(true);
+    }
+  });
+
+  const direction = settingsLeaving ? "Out" : "In";
+  const classes = `animate__animated animate__slide${direction}Right`;
+
+  return isSettingsVisible && (
     <Box
       flex="none"
       position="absolute"

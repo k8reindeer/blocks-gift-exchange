@@ -12,7 +12,7 @@ import {
 } from '@airtable/blocks/ui';
 import React, {useState} from 'react';
 import {Visualizer} from './visualizer';
-import {useSettings, SettingsForm} from './settings';
+import {useSettings} from './settings';
 import {WarningType, WarningsList} from './warnings';
 
 
@@ -76,7 +76,8 @@ function useValidateMatch(records) {
 }
 
 
-function SuccessMessage({settings}) {
+function SuccessMessage() {
+	const {settings} = useSettings();
   return (<>
 		<Icon 
 			className="animate__animated animate__tada" 
@@ -92,7 +93,8 @@ function SuccessMessage({settings}) {
 }
 
 
-export function Matcher({settings}) {
+export function Matcher() {
+	const {settings} = useSettings();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isVisualizationOpen, setIsVisualizationOpen] = useState(false);
 	const records = useRecords(settings.view);
@@ -189,7 +191,7 @@ export function Matcher({settings}) {
 		    	Make Match
 		  	</Button>
 				{isMatchValid ? 
-					<SuccessMessage settings={settings}/> :
+					<SuccessMessage /> :
 					<WarningsList warnings={warnings}/>
 			  }
 			  <Button margin={3} onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}>
@@ -198,7 +200,7 @@ export function Matcher({settings}) {
 			</Box>
 		</Box>
 	  <Box flex="auto">
-	  	{isVisualizationOpen && <Visualizer settings={settings}/>}
+	  	{isVisualizationOpen && <Visualizer/>}
 	  </Box>
     {isDialogOpen && (
       <ConfirmationDialog

@@ -3,58 +3,28 @@ import {
 	Box,
 	expandRecord,
 	loadCSSFromURLAsync,
-	Text,
-	useSettingsButton
+	Text
 } from '@airtable/blocks/ui';
 import React, {useEffect, useState} from 'react';
 import {Matcher} from './matcher';
-import {Visualizer} from './visualizer';
 import {useSettings, SettingsForm} from './settings';
 
 
 loadCSSFromURLAsync("https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css");
 
 function GiftExchangeBlock() {
-  const {areSettingsValid, message, settings} = useSettings();
-  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  const [settingsLeaving, setSettingsLeaving] = useState(false);
-
-  function closeSettings() {
-  	// Used to animate the settings pane when it closes
-  	setSettingsLeaving(true);
-  	setTimeout(() => {
-  		setIsSettingsVisible(false);
-  		setSettingsLeaving(false);
-  	}, 1000)
-  }
-
-  useSettingsButton(() => {
-  	if (isSettingsVisible) {
-  		closeSettings();
-  	} else {
-  		setIsSettingsVisible(true);
-  	}
-  });
-
-  // Open the SettingsForm whenever the settings are not valid
-  useEffect(() => {
-    if (!areSettingsValid) {
-      setIsSettingsVisible(true);
-    }
-  }, [areSettingsValid]);
+  const {areSettingsValid, message} = useSettings();
 
   return (
     <Box position="absolute" top="0" left="0" bottom="0" right="0" display="flex">
       <Box display="flex" flexDirection="column" flex="auto">
-      	{areSettingsValid ? <Matcher settings={settings}/> : (
+      	{areSettingsValid ? <Matcher/> : (
           <Box display="flex" flex="auto" alignItems="center" justifyContent="center">
             <Text textColor="light">{message}</Text>
           </Box>
       	)}
       </Box>
-      {isSettingsVisible &&  (
-        <SettingsForm closeSettings={closeSettings} settingsLeaving={settingsLeaving} settings={settings} />
-      )}
+      <SettingsForm/>
     </Box>
   );
 }
@@ -73,7 +43,6 @@ initializeBlock(() => <GiftExchangeBlock />);
 
 // # Cleanup
 
-// refactor so settings closes itself
 // uninstall unused cytoscape layouts, I like the circle
 // docstrings on everything
 // lint, cleanup code
