@@ -14,7 +14,7 @@ import {useSettings, SettingsForm} from './settings';
 
 loadCSSFromURLAsync("https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css");
 
-function SecretSantaBlock() {
+function GiftExchangeBlock() {
   const {areSettingsValid, message, settings} = useSettings();
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [settingsLeaving, setSettingsLeaving] = useState(false);
@@ -59,7 +59,7 @@ function SecretSantaBlock() {
   );
 }
 
-initializeBlock(() => <SecretSantaBlock />);
+initializeBlock(() => <GiftExchangeBlock />);
 
 // TODO
 
@@ -67,7 +67,6 @@ initializeBlock(() => <SecretSantaBlock />);
 
 // make present shake every time a new good one is found, not just the first time.
 // make present animate on hover
-// make tooltip in settings actually look good
 // center settings invalid message better
 // no warings if there's literally nothing in the column
 
