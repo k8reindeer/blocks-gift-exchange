@@ -40,8 +40,8 @@ function Warning({type, giver, recipient}) {
 				<RecordLink record={giver}/> is assigned to <RecordLink record={recipient}/> but they're both in the same group.
 			</>)
 		case WarningType.NO_GIVERS:
-			return <>Nobody is assigned to give to <RecordLink record={recipient}/></> 
-		case WarningType.MULTIPLE_GIVERS: 
+			return <>Nobody is assigned to give to <RecordLink record={recipient}/></>
+		case WarningType.MULTIPLE_GIVERS:
 			return <>Multiple people are assigned to give to <RecordLink record={recipient}/> </>
 		default:
 			return null;
@@ -56,9 +56,9 @@ export function WarningsList({warnings}) {
 		  flexDirection="column"
 		  minHeight="0"
 		  alignItems="flex-start">
-  	<Text> 
+  	<Text>
   		<Icon name="warning" size={16} marginX={2} fillColor={colorUtils.getHexForColor(colors.YELLOW_BRIGHT)}  />
-  		There are {warnings.length} issues 
+  		There are {warnings.length} issues
   	</Text>
   	<Box
   		marginY={2}

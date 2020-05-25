@@ -89,16 +89,16 @@ export function Visualizer() {
 
   // get the size from current viewport size? OR SOMETHING this is wacky now and too small
   return (<>
-  	<CytoscapeComponent 
-  		elements={[...elements]} 
-  		layout={layout} 
-  		cy={(cy) => { 
+  	<CytoscapeComponent
+  		elements={[...elements]}
+  		layout={layout}
+  		cy={(cy) => {
   			cy.nodes().on("click", (e) => {
   				expandRecord(records.find((r) => r.id === e.target.id()));
   			})
   			layoutInstance = cy.makeLayout(layout);
-  		}} 
-  		style={ { width: `${width}px`, height: '400px' } }  
+  		}}
+  		style={ { width: `${width}px`, height: '400px' } }
   		stylesheet={style}
   		userPanningEnabled={false}
   	/>

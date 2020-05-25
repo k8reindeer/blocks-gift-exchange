@@ -46,7 +46,7 @@ function useValidateMatch(records) {
 			if (assignmentId === r.id) {
 				warnings.push({type: WarningType.SELF_ASSIGNMENT, giver: r});
 			} else if (settings.groupField) {
-				// If there's a group field set up, make sure I'm not giving to someone in my group, 
+				// If there's a group field set up, make sure I'm not giving to someone in my group,
 				const assignment = records.find((x) => x.id === assignmentId)
 				const myGroup = r.getCellValue(settings.groupField.id);
 				if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
@@ -75,35 +75,16 @@ function useValidateMatch(records) {
 	}
 }
 
-
-function SuccessMessage({processingMatch}) {
-	const {settings} = useSettings();
-
-  return (<>
-		<Icon 
-			className={processingMatch ? "" : "animate__animated animate__tada"}
-			name="gift" 
-			margin={3} 
-			size={64} 
-			fillColor={colorUtils.getHexForColor(colors.RED)} 
-		/>
-		<Text textAlign="center"> 
-			Success! A perfect gift assignment is stored in the <strong>{settings.assignmentField.name}</strong> field! 
-		</Text> 
-	</>)
-}
-
-
 export function Matcher() {
 	const {settings} = useSettings();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isVisualizationOpen, setIsVisualizationOpen] = useState(false);
-	const [processingMatch, setProcessingMatch] = useState(false);
+	const [shakePresent, setShakePresent] = useState(false);
+
 	const records = useRecords(settings.view);
 	const {isMatchValid, warnings} = useValidateMatch(records);
 
 	async function makeMatch() {
-		setProcessingMatch(true);
 		const records = (await settings.view.selectRecordsAsync()).records;
 
 		function getRandomItem(arr) {
@@ -115,7 +96,7 @@ export function Matcher() {
 			let assignments = [];
 			let remaining = new Set(records.map((r) => {
 				return {
-					id: r.id, 
+					id: r.id,
 					group: settings.assignmentField && r.getCellValue(settings.groupField.id).id
 				}
 			}));
@@ -158,9 +139,11 @@ export function Matcher() {
 		while (retries++ < 5) {
 			const {success, assignments} = tryMatch();
 			await settings.table.updateRecordsAsync(assignments);
-			if (success) break;
+			if (success) {
+				wigglePresent();
+				break;
+			}
 		}
-		setProcessingMatch(false);
 	}
 
 	const areAssignmentsEmpty = records.every((r) => r.getCellValue(settings.assignmentField.id) == null);
@@ -174,8 +157,14 @@ export function Matcher() {
 		}
 	}
 
+	function wigglePresent() {
+		setShakePresent(true);
+		setTimeout(() => setShakePresent(false), 1000);
+	}
+
+
 	return (<Box display="flex" flex="auto" alignItems="flex-start" justifyContent="center">
-		<Box 
+		<Box
 			flex="none"
       display="flex"
       flexDirection="column"
@@ -196,8 +185,17 @@ export function Matcher() {
 				<Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch}>
 		    	Make Match
 		  	</Button>
-				{isMatchValid ? 
-					<SuccessMessage processingMatch={processingMatch}/> :
+				{isMatchValid ?
+					<>
+						<Icon
+							className={shakePresent ?  "animate__animated animate__tada" : ""}
+							name="gift" onMouseEnter={wigglePresent}
+							margin={3} size={64} fillColor={colorUtils.getHexForColor(colors.RED)}
+						/>
+						<Text textAlign="center">
+							Success! A perfect gift assignment is stored in the <strong>{settings.assignmentField.name}</strong> field!
+						</Text>
+					</> :
 					<>
 						{areAssignmentsEmpty ?
 						<Text> No assignments yet. Click above to make a match!</Text> :

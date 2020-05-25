@@ -128,7 +128,7 @@ export function SettingsForm() {
         overflowY="auto"
       >
         <Heading marginBottom={3}>Settings</Heading>
-        <FormField 
+        <FormField
           label="Table"
           decription="The table with the records you want to assign"
         >
@@ -145,7 +145,7 @@ export function SettingsForm() {
                 globalConfigKey={ConfigKeys.VIEW_ID}
               />
             </FormField>
-            <FormField 
+            <FormField
               label="Assignment field"
               description="Field to store the gift-giving assignments."
             >
@@ -155,7 +155,7 @@ export function SettingsForm() {
                 allowedTypes={[FieldType.MULTIPLE_RECORD_LINKS]}
               />
             </FormField>
-            <FormField 
+            <FormField
               label="Group field (optional)"
               description="People in the same group won't be assigned to each other"
             >

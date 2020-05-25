@@ -33,7 +33,7 @@ function GiftExchangeBlock() {
 			    		<Icon name="warning" size={16} marginX={2} fillColor={colorUtils.getHexForColor(colors.ORANGE_BRIGHT)}/>
 					  </Tooltip>
 						<Text textColor="light">
-				     	Settings Invalid 
+				     	Settings Invalid
 				   	</Text>
 				  </Box>
       	)}
