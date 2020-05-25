@@ -1,15 +1,17 @@
-import {Box, Button, expandRecord, useRecords, colorUtils, useViewport} from '@airtable/blocks/ui';
-import {useSettings} from './settings';
-
+import {
+  Box,
+  Button,
+  expandRecord,
+  useRecords,
+  colorUtils, 
+  useViewport
+} from '@airtable/blocks/ui';
+import React, {useEffect} from 'react';
 import cytoscape from 'cytoscape';
 import avsdf from 'cytoscape-avsdf';
-
-import cola from 'cytoscape-cola';
-import spread from 'cytoscape-spread';
-import coseBilkent from 'cytoscape-cose-bilkent';
-
-import React, {useEffect} from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
+import {useSettings} from './settings';
+
 
 cytoscape.use( avsdf );
 

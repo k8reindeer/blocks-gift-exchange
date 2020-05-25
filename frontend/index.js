@@ -47,9 +47,6 @@ initializeBlock(() => <GiftExchangeBlock />);
 
 // TODO
 
-// # Visual
-
-// make present animate on hover
 
 // # Cleanup
 
