@@ -62,8 +62,8 @@ export function useSettings() {
     };
   }
 
-  if (!table) return invalid('Pick the table with the people you want to assign');
-  if (!view) return invalid('Pick the view with the people you want to assign');
+  if (!table) return invalid('Pick a table for assignment');
+  if (!view) return invalid('Pick a view for assignment');
   if (!assignmentField) return invalid('Pick a field to save assignments');
   if (assignmentField.type != FieldType.MULTIPLE_RECORD_LINKS) return invalid('Assignment field must be a link field');
   if (groupField && groupField.type != FieldType.SINGLE_SELECT) return invalid('Group field must be a single select field');
@@ -128,14 +128,17 @@ export function SettingsForm() {
         overflowY="auto"
       >
         <Heading marginBottom={3}>Settings</Heading>
-        <FormField label="Table">
+        <FormField 
+          label="Table"
+          decription="The table with the records you want to assign"
+        >
           <TablePickerSynced globalConfigKey={ConfigKeys.TABLE_ID} />
         </FormField>
         {settings.table && (
           <>
             <FormField
               label="View"
-              description="Only people in this view will be matched"
+              description="Only records in this view will be matched"
             >
               <ViewPickerSynced
                 table={settings.table}
@@ -144,7 +147,7 @@ export function SettingsForm() {
             </FormField>
             <FormField 
               label="Assignment field"
-              description="Where to store the gift-giving assignments."
+              description="Field to store the gift-giving assignments."
             >
               <FieldPickerSynced
                 table={settings.table}

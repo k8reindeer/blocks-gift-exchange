@@ -1,9 +1,13 @@
 import {
 	initializeBlock,
 	Box,
+	colors,
+	colorUtils,
 	expandRecord,
+	Icon,
 	loadCSSFromURLAsync,
-	Text
+	Text,
+	Tooltip
 } from '@airtable/blocks/ui';
 import React, {useEffect, useState} from 'react';
 import {Matcher} from './matcher';
@@ -19,9 +23,19 @@ function GiftExchangeBlock() {
     <Box position="absolute" top="0" left="0" bottom="0" right="0" display="flex">
       <Box display="flex" flexDirection="column" flex="auto">
       	{areSettingsValid ? <Matcher/> : (
-          <Box display="flex" flex="auto" alignItems="center" justifyContent="center">
-            <Text textColor="light">{message}</Text>
-          </Box>
+      		<Box margin={3} display="flex" flexDirection="row" justifyContent="start">
+    				<Tooltip
+					    content={message}
+					    placementX={Tooltip.placements.CENTER}
+					    placementY={Tooltip.placements.BOTTOM}
+					    shouldHideTooltipOnClick={true}
+					  >
+			    		<Icon name="warning" size={16} marginX={2} fillColor={colorUtils.getHexForColor(colors.ORANGE_BRIGHT)}/>
+					  </Tooltip>
+						<Text textColor="light">
+				     	Settings Invalid 
+				   	</Text>
+				  </Box>
       	)}
       </Box>
       <SettingsForm/>
@@ -36,7 +50,6 @@ initializeBlock(() => <GiftExchangeBlock />);
 // # Visual
 
 // make present animate on hover
-// center settings invalid message better
 
 // # Cleanup
 
