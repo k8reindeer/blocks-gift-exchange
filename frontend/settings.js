@@ -65,8 +65,10 @@ export function useSettings() {
   if (!table) return invalid('Pick a table for assignment');
   if (!view) return invalid('Pick a view for assignment');
   if (!assignmentField) return invalid('Pick a field to save assignments');
-  if (assignmentField.type != FieldType.MULTIPLE_RECORD_LINKS) return invalid('Assignment field must be a link field');
-  if (groupField && groupField.type != FieldType.SINGLE_SELECT) return invalid('Group field must be a single select field');
+  if (assignmentField.type != FieldType.MULTIPLE_RECORD_LINKS) 
+    return invalid('Assignment field must be a link field');
+  if (groupField && groupField.type != FieldType.SINGLE_SELECT) 
+    return invalid('Group field must be a single select field');
 
   return {
     areSettingsValid: true,
@@ -74,6 +76,11 @@ export function useSettings() {
   };
 }
 
+
+/**
+ * The settings form component.
+ * Handles display logic for opening/closing itself.
+ */
 export function SettingsForm() {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [settingsLeaving, setSettingsLeaving] = useState(false);
@@ -86,7 +93,7 @@ export function SettingsForm() {
     }
   }, [areSettingsValid]);
 
-  // Animate the settings pane when it closes
+  // Animate the settings form when it closes
   function closeSettings() {
     setSettingsLeaving(true);
     setTimeout(() => {
@@ -103,29 +110,16 @@ export function SettingsForm() {
     }
   });
 
-  const direction = settingsLeaving ? "Out" : "In";
-  const classes = `animate__animated animate__slide${direction}Right`;
-
   return isSettingsVisible && (
     <Box
-      flex="none"
-      position="absolute"
-      top="0" bottom="0" right="0"
-      display="flex"
-      flexDirection="column"
-      width="300px"
-      backgroundColor="white"
-      maxHeight="100vh"
-      borderLeft="thick"
-      className={classes}
+      flex="none" display="flex" flexDirection="column"
+      position="absolute" top="0" bottom="0" right="0"
+      width="300px" maxHeight="100vh" borderLeft="thick" backgroundColor="white"
+      className={`animate__animated animate__slide${settingsLeaving ? "Out" : "In"}Right`}
     >
       <Box
-        flex="auto"
-        display="flex"
-        flexDirection="column"
-        minHeight="0"
-        padding={3}
-        overflowY="auto"
+        flex="auto" display="flex" flexDirection="column"
+        minHeight="0" padding={3} overflowY="auto"
       >
         <Heading marginBottom={3}>Settings</Heading>
         <FormField
@@ -169,12 +163,8 @@ export function SettingsForm() {
         )}
       </Box>
       <Box
-        flex="none"
-        display="flex"
-        justifyContent="flex-end"
-        paddingY={3}
-        marginX={3}
-        borderTop="thick"
+        flex="none" display="flex" justifyContent="flex-end"
+        paddingY={3} marginX={3} borderTop="thick"
       >
         <Button variant="primary" size="large" onClick={closeSettings}>
           Done

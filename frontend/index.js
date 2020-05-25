@@ -30,7 +30,8 @@ function GiftExchangeBlock() {
 					    placementY={Tooltip.placements.BOTTOM}
 					    shouldHideTooltipOnClick={true}
 					  >
-			    		<Icon name="warning" size={16} marginX={2} fillColor={colorUtils.getHexForColor(colors.ORANGE_BRIGHT)}/>
+			    		<Icon name="warning" size={16} marginX={2} 
+			    			fillColor={colorUtils.getHexForColor(colors.ORANGE_BRIGHT)}/>
 					  </Tooltip>
 						<Text textColor="light">
 				     	Settings Invalid
@@ -44,12 +45,3 @@ function GiftExchangeBlock() {
 }
 
 initializeBlock(() => <GiftExchangeBlock />);
-
-// TODO
-
-
-// # Cleanup
-
-// uninstall unused cytoscape layouts, I like the circle
-// docstrings on everything
-// lint, cleanup code

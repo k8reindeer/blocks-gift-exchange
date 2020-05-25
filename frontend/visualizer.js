@@ -15,6 +15,13 @@ import {useSettings} from './settings';
 
 cytoscape.use( avsdf );
 
+/**
+ * Visualize the current match using cytoscape
+ *
+ * Each record is displayed as a node, and any assignments in 
+ * the configured assignmentField are displayed as edges.  
+ * Updates as the records / links are updated.
+ */
 export function Visualizer() {
   const {settings} = useSettings();
 	const records = useRecords(settings.view);
@@ -28,11 +35,12 @@ export function Visualizer() {
 	for (let r of records) {
 		let nodeData = { id: r.id, label: r.name }
 		if (settings.groupField) {
-			// Mark which group for color coding if groups are being used
+			// If groups are being used, specify which group (used for color coding)
 			nodeData['group'] = r.getCellValue(settings.groupField.id).id;
 		}
 		elements.push({data: nodeData})
 
+    // Display visualization even if there are no assignments or assignments are invalid
 		const assignments = r.getCellValue(settings.assignmentField.id);
 		if (!assignments) {
 			continue;
@@ -73,7 +81,7 @@ export function Visualizer() {
     }
   ]
   if (settings.groupField) {
-  	// Style groups by their color if groups are being used
+  	// If groups are being used, style each node by its group's color
   	for (let choice of settings.groupField.options.choices) {
   		const color = colorUtils.shouldUseLightTextOnColor(choice.color) ? {'color': 'white'} : {};
 	  	style.push({
@@ -89,7 +97,6 @@ export function Visualizer() {
   const layout = { name: 'avsdf', randomize: false, refresh: 30, nodeSeparation: 90};
   const width = viewport.size.width-200
 
-  // get the size from current viewport size? OR SOMETHING this is wacky now and too small
   return (<>
   	<CytoscapeComponent
   		elements={[...elements]}

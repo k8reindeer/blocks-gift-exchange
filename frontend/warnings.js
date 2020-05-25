@@ -19,6 +19,10 @@ export const WarningType = Object.freeze({
   MULTIPLE_GIVERS: 'multiple_givers'
 });
 
+/**
+ * A utility component for rendering a link to a record that
+ * expands that record when clicked.
+ */
 function RecordLink({record}) {
 	return (
 		<TextButton onClick={() => expandRecord(record)}>
@@ -27,6 +31,14 @@ function RecordLink({record}) {
 	)
 }
 
+/** 
+ * Renders a single warning message
+ * @param {WarningType} type 
+ * @param {Record} [giver] - required when type is NO_ASSIGNMENT, 
+ *     MULTIPLE_ASSIGNMENTS, SELF_ASSIGNMENT, or SAME_GROUP_ASSIGNMENT
+ * @param {Record} [recipient] - required when type is SAME_GROUP_ASSIGNMENT, 
+ *     NO_GIVERS, or MULTIPLE_GIVERS
+ */
 function Warning({type, giver, recipient}) {
 	switch(type) {
 		case WarningType.NO_ASSIGNMENT:
@@ -48,31 +60,26 @@ function Warning({type, giver, recipient}) {
 	}
 }
 
+/**
+ * Renders a list of warning messages in a scollable box
+ */
 export function WarningsList({warnings}) {
 	return(
 		<Box
-		  flex="auto"
-		  display="flex"
-		  flexDirection="column"
-		  minHeight="0"
-		  alignItems="flex-start">
+		  flex="auto" display="flex" flexDirection="column" 
+		  alignItems="flex-start" minHeight="0"
+		 >
   	<Text>
-  		<Icon name="warning" size={16} marginX={2} fillColor={colorUtils.getHexForColor(colors.YELLOW_BRIGHT)}  />
+  		<Icon 
+  			name="warning" size={16} marginX={2} 
+  			fillColor={colorUtils.getHexForColor(colors.YELLOW_BRIGHT)}  
+  		/>
   		There are {warnings.length} issues
   	</Text>
-  	<Box
-  		marginY={2}
-  		overflowY="scroll"
-		  maxHeight="100vh"
-		  backgroundColor="lightGray3">
+  	<Box marginY={2} overflowY="scroll" maxHeight="100vh" backgroundColor="lightGray3">
 	  	{warnings.map((w, i) => {
 	  		return (
-	  			<Box
-	  				key={i}
-	  				margin={2}
-	  				padding={1}
-	  				borderRadius={2}
-	  				backgroundColor="white">
+	  			<Box key={i} margin={2} padding={1} borderRadius={2} backgroundColor="white">
 	  				<Warning {...w}/>
 	  			</Box>
 	  		)
