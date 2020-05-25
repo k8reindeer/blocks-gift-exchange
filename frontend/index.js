@@ -37,8 +37,6 @@ initializeBlock(() => <GiftExchangeBlock />);
 
 // make present animate on hover
 // center settings invalid message better
-// no warings if there's literally nothing in the column
-
 
 // # Cleanup
 

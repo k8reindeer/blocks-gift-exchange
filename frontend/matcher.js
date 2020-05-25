@@ -163,6 +163,8 @@ export function Matcher() {
 		setProcessingMatch(false);
 	}
 
+	const areAssignmentsEmpty = records.every((r) => r.getCellValue(settings.assignmentField.id) == null);
+
 	function safeMakeMatch() {
 		if (isMatchValid) {
 			// If the match is already valid, warn before continuing
@@ -196,7 +198,11 @@ export function Matcher() {
 		  	</Button>
 				{isMatchValid ? 
 					<SuccessMessage processingMatch={processingMatch}/> :
-					<WarningsList warnings={warnings}/>
+					<>
+						{areAssignmentsEmpty ?
+						<Text> No assignments yet. Click above to make a match!</Text> :
+						<WarningsList warnings={warnings}/>}
+					</>
 			  }
 			  <Button margin={3} onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}>
 			  	{isVisualizationOpen ? "Hide Visualiation" : "Show Visualization"}
