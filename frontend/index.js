@@ -65,22 +65,16 @@ initializeBlock(() => <SecretSantaBlock />);
 
 // # Visual
 
-// ability to hide visualization if you want to keep it a secret (hide by default)
 // make present shake every time a new good one is found, not just the first time.
 // make present animate on hover
 // make tooltip in settings actually look good
 // center settings invalid message better
+// no warings if there's literally nothing in the column
 
-
-// # Functional
-
-// better matching algorithm
-// - no warnings, by default
-// - make it animate gradually as the assignments get made
 
 // # Cleanup
 
-// refactor into separate files
+// refactor so settings closes itself
 // uninstall unused cytoscape layouts, I like the circle
 // docstrings on everything
 // lint, cleanup code

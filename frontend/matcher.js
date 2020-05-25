@@ -92,29 +92,69 @@ function SuccessMessage({settings}) {
 }
 
 
-
 export function Matcher({settings}) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [isVisualizationOpen, setIsVisualizationOpen] = useState(false);
 	const records = useRecords(settings.view);
 	const {isMatchValid, warnings} = useValidateMatch(records);
 
 	async function makeMatch() {
 		const records = (await settings.view.selectRecordsAsync()).records;
 
-		// randomly assign (TODO better algorithm here!! at least avoid stated constraints)
-		const recordIds = records.map((r) => r.id);
-	  recordIds.sort(function (a, b) { return 0.5 - Math.random() })
-		const assignments = recordIds.map((this_id, i, arr) => {
-			const next_id = arr[(i+1) % arr.length];
-			return {
-				id: this_id,
-				fields: {
-					[settings.assignmentField.id]: [{id: next_id}],
-				}
-			}
-		});
+		function getRandomItem(arr) {
+	    return arr[Math.floor(Math.random() * arr.length)];
+		}
 
-		settings.table.updateRecordsAsync(assignments);
+		function tryMatch() {
+			// returns a {success, list of assignments}
+			let assignments = [];
+			let remaining = new Set(records.map((r) => {
+				return {
+					id: r.id, 
+					group: settings.assignmentField && r.getCellValue(settings.groupField.id).id
+				}
+			}));
+
+			const first = getRandomItem(Array.from(remaining))
+			remaining.delete(first);
+			let current = first
+			while (remaining.size > 0) {
+				const possibleNext = Array.from(remaining).filter((x) => x.group != current.group)
+				if (possibleNext.length === 0) {
+					// We've hit a dead end
+					return {success: false, assignments};
+				}
+				const next = getRandomItem(possibleNext);
+				remaining.delete(next);
+				assignments.push({
+					id: current.id,
+					fields: {
+						[settings.assignmentField.id]: [{id: next.id}]
+					}
+				});
+				current = next;
+			}
+
+			// and complete the loop, if the groups match up
+			if (current.group === first.group) {
+				return {success: false, assignments};
+			}
+			assignments.push({
+				id: current.id,
+				fields: {
+					[settings.assignmentField.id]: [{id: first.id}]
+				}
+			});
+			return {success: true, assignments};
+		}
+
+		// It may not be possible, but try 5 times
+		var retries = 0;
+		while (retries++ < 5) {
+			const {success, assignments} = tryMatch();
+			await settings.table.updateRecordsAsync(assignments);
+			if (success) break;
+		}
 	}
 
 	function safeMakeMatch() {
@@ -152,10 +192,13 @@ export function Matcher({settings}) {
 					<SuccessMessage settings={settings}/> :
 					<WarningsList warnings={warnings}/>
 			  }
+			  <Button margin={3} onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}>
+			  	{isVisualizationOpen ? "Hide Visualiation" : "Show Visualization"}
+				</Button>
 			</Box>
 		</Box>
 	  <Box flex="auto">
-	  	<Visualizer settings={settings}/>
+	  	{isVisualizationOpen && <Visualizer settings={settings}/>}
 	  </Box>
     {isDialogOpen && (
       <ConfirmationDialog
