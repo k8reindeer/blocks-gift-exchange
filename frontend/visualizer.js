@@ -1,4 +1,4 @@
-import {Box, Button, expandRecord, useRecords, colorUtils} from '@airtable/blocks/ui';
+import {Box, Button, expandRecord, useRecords, colorUtils, useViewport} from '@airtable/blocks/ui';
 import cytoscape from 'cytoscape';
 import avsdf from 'cytoscape-avsdf';
 
@@ -13,6 +13,7 @@ cytoscape.use( avsdf );
 
 export function Visualizer({settings}) {
 	const records = useRecords(settings.view);
+	const viewport = useViewport();
 	var layoutInstance;
 
 	let elements = [];
@@ -35,10 +36,8 @@ export function Visualizer({settings}) {
 			elements.push({ data: { source: r.id, target: a.id } })
 		}
 	}
-	console.log(elements);
 
 	useEffect(() => {
-		console.log("using effect");
 		if (layoutInstance) {
 			layoutInstance.run();
 		}
@@ -48,13 +47,19 @@ export function Visualizer({settings}) {
     {
       selector: 'node',
       style: {
-        'label': 'data(label)'
+        'label': 'data(label)',
+        'width': 'label',
+        'height': 'label',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'shape': 'ellipse',
+        'padding': '8px'
       }
     },
     {
       selector: 'edge',
       style: {
-        'width': 3,
+        'width': 5,
         'line-color': '#ccc',
         'target-arrow-color': '#ccc',
         'target-arrow-shape': 'triangle',
@@ -65,16 +70,19 @@ export function Visualizer({settings}) {
   if (settings.groupField) {
   	// Style groups by their color if groups are being used
   	for (let choice of settings.groupField.options.choices) {
+  		const color = colorUtils.shouldUseLightTextOnColor(choice.color) ? {'color': 'white'} : {};
 	  	style.push({
 	  		selector: `[group="${choice.id}"]`,
 	  		style: {
-	  			'background-color': colorUtils.getHexForColor(choice.color)
+	  			'background-color': colorUtils.getHexForColor(choice.color),
+	  			...color
 	  		}
 	  	})
 	  }
   }
 
-  const layout = { name: 'avsdf', handleDisconnected: true, randomize: false, prelayout: { name: 'cola' }};
+  const layout = { name: 'avsdf', randomize: false, refresh: 30, nodeSeparation: 90};
+  const width = viewport.size.width-200
 
   // get the size from current viewport size? OR SOMETHING this is wacky now and too small
   return (<>
@@ -87,8 +95,9 @@ export function Visualizer({settings}) {
   			})
   			layoutInstance = cy.makeLayout(layout);
   		}} 
-  		style={ { height: '400px' } }  
+  		style={ { width: `${width}px`, height: '400px' } }  
   		stylesheet={style}
+  		userPanningEnabled={false}
   	/>
   </>)
 }

@@ -176,7 +176,6 @@ function MatchMaker({settings}) {
       width="200px"
       backgroundColor="white"
       height="100%"
-      maxHeight="100vh"
       borderRight="thick"
 		>
 		  <Box
@@ -217,9 +216,22 @@ function MatchMaker({settings}) {
 function SecretSantaBlock() {
   const {areSettingsValid, message, settings} = useSettings();
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+  const [settingsLeaving, setSettingsLeaving] = useState(false);
+
+  function closeSettings() {
+  	setSettingsLeaving(true);
+  	setTimeout(() => {
+  		setIsSettingsVisible(false);
+  		setSettingsLeaving(false);
+  	}, 1000)
+  }
 
   useSettingsButton(() => {
-    setIsSettingsVisible(!isSettingsVisible);
+  	if (isSettingsVisible) {
+  		closeSettings();
+  	} else {
+  		setIsSettingsVisible(true);
+  	}
   });
 
   // Open the SettingsForm whenever the settings are not valid
@@ -239,7 +251,7 @@ function SecretSantaBlock() {
       	)}
       </Box>
       {isSettingsVisible &&  (
-        <SettingsForm setIsSettingsVisible={setIsSettingsVisible} settings={settings} />
+        <SettingsForm closeSettings={closeSettings} settingsLeaving={settingsLeaving} settings={settings} />
       )}
     </Box>
   );
@@ -251,16 +263,11 @@ initializeBlock(() => <SecretSantaBlock />);
 
 // # Visual
 
-// Group the warnings??, make them a lot prettier. 
-// warning bullet styling
-// warning icon styling
-// refactor warnings
-// Layout -- make the nodes/labels big, but buttons laid out on the side with good margins
-// ability to hide visualization if you want to keep it a secret
-// make layout work with settings open or closed even as viewport changes
-// make it shake every time a new good one is found, not just the first time.
-// make it animate on hover
-// make tooltip actually look good
+// refactor warnings to output in terms of types not jsx elements
+// ability to hide visualization if you want to keep it a secret (hide by default)
+// make present shake every time a new good one is found, not just the first time.
+// make present animate on hover
+// make tooltip in settings actually look good
 
 
 // # Functional
@@ -272,6 +279,7 @@ initializeBlock(() => <SecretSantaBlock />);
 
 // # Cleanup
 
-// uninstall unused cytoscape layouts, I like the circle (OR, make it switchable?)
+// refactor into separate files
+// uninstall unused cytoscape layouts, I like the circle
 // docstrings on everything
 // lint, cleanup code

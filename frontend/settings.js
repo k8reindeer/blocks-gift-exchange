@@ -74,16 +74,21 @@ export function useSettings() {
   };
 }
 
-export function SettingsForm({setIsSettingsVisible, settings}) {
+export function SettingsForm({closeSettings, settingsLeaving, settings}) {
+  const direction = settingsLeaving ? "Out" : "In"
+  const classes = `animate__animated animate__slide${direction}Right`
   return (
     <Box
       flex="none"
+      position="absolute"
+      top="0" bottom="0" right="0"
       display="flex"
       flexDirection="column"
       width="300px"
       backgroundColor="white"
       maxHeight="100vh"
       borderLeft="thick"
+      className={classes}
     >
       <Box
         flex="auto"
@@ -147,7 +152,7 @@ export function SettingsForm({setIsSettingsVisible, settings}) {
         marginX={3}
         borderTop="thick"
       >
-        <Button variant="primary" size="large" onClick={() => setIsSettingsVisible(false)}>
+        <Button variant="primary" size="large" onClick={closeSettings}>
           Done
         </Button>
       </Box>
