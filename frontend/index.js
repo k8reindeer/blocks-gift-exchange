@@ -65,7 +65,6 @@ initializeBlock(() => <SecretSantaBlock />);
 
 // # Visual
 
-// refactor warnings to output in terms of types not jsx elements
 // ability to hide visualization if you want to keep it a secret (hide by default)
 // make present shake every time a new good one is found, not just the first time.
 // make present animate on hover
