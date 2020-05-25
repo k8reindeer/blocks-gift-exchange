@@ -35,7 +35,6 @@ initializeBlock(() => <GiftExchangeBlock />);
 
 // # Visual
 
-// make present shake every time a new good one is found, not just the first time.
 // make present animate on hover
 // center settings invalid message better
 // no warings if there's literally nothing in the column

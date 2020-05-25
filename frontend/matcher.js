@@ -76,11 +76,12 @@ function useValidateMatch(records) {
 }
 
 
-function SuccessMessage() {
+function SuccessMessage({processingMatch}) {
 	const {settings} = useSettings();
+
   return (<>
 		<Icon 
-			className="animate__animated animate__tada" 
+			className={processingMatch ? "" : "animate__animated animate__tada"}
 			name="gift" 
 			margin={3} 
 			size={64} 
@@ -97,10 +98,12 @@ export function Matcher() {
 	const {settings} = useSettings();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isVisualizationOpen, setIsVisualizationOpen] = useState(false);
+	const [processingMatch, setProcessingMatch] = useState(false);
 	const records = useRecords(settings.view);
 	const {isMatchValid, warnings} = useValidateMatch(records);
 
 	async function makeMatch() {
+		setProcessingMatch(true);
 		const records = (await settings.view.selectRecordsAsync()).records;
 
 		function getRandomItem(arr) {
@@ -157,6 +160,7 @@ export function Matcher() {
 			await settings.table.updateRecordsAsync(assignments);
 			if (success) break;
 		}
+		setProcessingMatch(false);
 	}
 
 	function safeMakeMatch() {
@@ -191,7 +195,7 @@ export function Matcher() {
 		    	Make Match
 		  	</Button>
 				{isMatchValid ? 
-					<SuccessMessage /> :
+					<SuccessMessage processingMatch={processingMatch}/> :
 					<WarningsList warnings={warnings}/>
 			  }
 			  <Button margin={3} onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}>
