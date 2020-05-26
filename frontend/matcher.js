@@ -6,6 +6,7 @@ import {
   ConfirmationDialog,
   Icon,
   Text,
+  Tooltip,
   useRecords,
 } from '@airtable/blocks/ui';
 import React, {useState} from 'react';
@@ -67,12 +68,12 @@ function useValidateMatch(records) {
         // If there's a group field set up, make sure I'm not giving to someone in my group,
         const assignment = records.find((x) => x.id === assignmentId)
         if (!assignment) {
-        	warnings.push({type: WarningType.INVALID_ASSIGNMENT, giver: r})
+          warnings.push({type: WarningType.INVALID_ASSIGNMENT, giver: r})
         } else {
-        	const myGroup = r.getCellValue(settings.groupField.id);
-	        if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
-	          warnings.push({type: WarningType.SAME_GROUP_ASSIGNMENT, giver: r, recipient: assignment});
-	        }
+          const myGroup = r.getCellValue(settings.groupField.id);
+          if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
+            warnings.push({type: WarningType.SAME_GROUP_ASSIGNMENT, giver: r, recipient: assignment});
+          }
         }
       }
     }
@@ -107,7 +108,7 @@ export function Matcher() {
   const {isMatchValid, warnings} = useValidateMatch(records);
 
   async function makeMatch() {
-  	// We don't want the records changing out from under us while searching for a matching
+    // We don't want the records changing out from under us while searching for a matching
     const records = (await settings.view.selectRecordsAsync()).records;
 
     function getRandomItem(arr) {
@@ -121,8 +122,8 @@ export function Matcher() {
      * the same group.) This algorithm doesn't definitively prove if a matching is impossible - it simply
      * tries greedily to find a working match 5 times and then gives up 
      * @returns {{
-		 *   success: boolean,
-		 *   assignments: {id: string, fields: Object}[]
+     *   success: boolean,
+     *   assignments: {id: string, fields: Object}[]
      * }}
      * The assignments return value can directly be used to create records, even if the full matching
      * was unsuccessful
@@ -183,6 +184,10 @@ export function Matcher() {
 
   const areAssignmentsEmpty = records.every((r) => r.getCellValue(settings.assignmentField.id) == null);
 
+  const {hasPermission, reasonDisplayString} = settings.table.checkPermissionsForUpdateRecord(undefined, {
+    [settings.assignmentField.id]: undefined,
+  })
+
   function safeMakeMatch() {
     if (isMatchValid) {
       // If the match is already valid, warn before continuing
@@ -204,9 +209,17 @@ export function Matcher() {
       <Box
         flex="auto" display="flex" flexDirection="column" alignItems="center"
         minHeight="0" padding={3} overflowY="auto">
-        <Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch}>
-          Make Match
-        </Button>
+        <Tooltip
+          content={reasonDisplayString}
+          placementX={Tooltip.placements.RIGHT}
+          placementY={Tooltip.placements.CENTER}
+        >
+          <Box>
+            <Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch} disabled={!hasPermission}>
+              Make Match
+            </Button>
+          </Box>
+        </Tooltip>
         {isMatchValid ?
           <>
             <Icon
