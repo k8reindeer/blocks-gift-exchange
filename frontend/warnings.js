@@ -16,7 +16,8 @@ export const WarningType = Object.freeze({
   SELF_ASSIGNMENT: 'self_assignment',
   SAME_GROUP_ASSIGNMENT: 'same_group_assignment',
   NO_GIVERS: 'no_givers',
-  MULTIPLE_GIVERS: 'multiple_givers'
+  MULTIPLE_GIVERS: 'multiple_givers',
+  INVALID_ASSIGNMENT: 'invalid_assignment'
 });
 
 /**
@@ -49,12 +50,14 @@ function Warning({type, giver, recipient}) {
       return <><RecordLink record={giver}/> is assigned to themself!</>
     case WarningType.SAME_GROUP_ASSIGNMENT:
       return (<>
-        <RecordLink record={giver}/> is assigned to <RecordLink record={recipient}/> but they&apos;re both in the same group.
+        <RecordLink record={giver}/> is assigned to <RecordLink record={recipient}/> but they&apos;re both in the same group
       </>)
     case WarningType.NO_GIVERS:
       return <>Nobody is assigned to give to <RecordLink record={recipient}/></>
     case WarningType.MULTIPLE_GIVERS:
       return <>Multiple people are assigned to give to <RecordLink record={recipient}/> </>
+    case WarningType.INVALID_ASSIGNMENT:
+      return <><RecordLink record={giver}/> is assigned to a record in the wrong view</>
     default:
       return null;
   }

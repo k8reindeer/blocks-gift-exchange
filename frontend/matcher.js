@@ -66,9 +66,13 @@ function useValidateMatch(records) {
       } else if (settings.groupField) {
         // If there's a group field set up, make sure I'm not giving to someone in my group,
         const assignment = records.find((x) => x.id === assignmentId)
-        const myGroup = r.getCellValue(settings.groupField.id);
-        if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
-          warnings.push({type: WarningType.SAME_GROUP_ASSIGNMENT, giver: r, recipient: assignment});
+        if (!assignment) {
+        	warnings.push({type: WarningType.INVALID_ASSIGNMENT, giver: r})
+        } else {
+        	const myGroup = r.getCellValue(settings.groupField.id);
+	        if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
+	          warnings.push({type: WarningType.SAME_GROUP_ASSIGNMENT, giver: r, recipient: assignment});
+	        }
         }
       }
     }

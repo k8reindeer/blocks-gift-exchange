@@ -50,7 +50,10 @@ export function Visualizer() {
       continue;
     }
     for (let a of assignments) {
-      elements.push({ data: { source: r.id, target: a.id } })
+      // If the edge points to a record not in this view, don't display it
+      if (records.find((rec) => rec.id === a.id)) {
+        elements.push({ data: { source: r.id, target: a.id } })
+      }
     }
   }
 
