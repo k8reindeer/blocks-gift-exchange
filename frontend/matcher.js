@@ -14,6 +14,26 @@ import {useSettings} from './settings';
 import {WarningType, WarningsList} from './warnings';
 
 
+/**
+ * Determine whether the current assignments in assignmentField make a valid gift assignment
+ * 
+ * * Every record is assigned to exactly 1 other record 
+ *     (otherwise returns warning of type NO_ASSIGNMENT or MULTIPLE_ASSIGNMENTS)
+ * * No record is assigned to itself (otherwise returns warning of type SELF_ASSIGNMENT)
+ * * No record is assigned to a record that is in the same group according to groupField
+ *     (otherwise returns warning of type SAME_GROUP_ASSIGNMENT)
+ * * Every record has exactly 1 other record assigned to it
+ *     (otherwise returns warning of type NO_GIVERS or MULTIPLE_GIVERS)
+ *
+ * @returns {
+ *   isMatchValid: boolean,
+ *   warnings: {
+ *     type: WarningType,
+ *     giver: Record | null,
+ *     recipient: Record | null
+ *   }[]
+ * }
+ */
 function useValidateMatch(records) {
   const {settings} = useSettings();
 
@@ -83,14 +103,27 @@ export function Matcher() {
   const {isMatchValid, warnings} = useValidateMatch(records);
 
   async function makeMatch() {
+  	// We don't want the records changing out from under us while searching for a matching
     const records = (await settings.view.selectRecordsAsync()).records;
 
     function getRandomItem(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
+    /**
+     * Try to randomly make a matching
+     * 
+     * A matching following all the rules may not be possible (example: over half of people are in
+     * the same group.) This algorithm doesn't definitively prove if a matching is impossible - it simply
+     * tries greedily to find a working match 5 times and then gives up 
+     * @returns {{
+		 *   success: boolean,
+		 *   assignments: {id: string, fields: Object}[]
+     * }}
+     * The assignments return value can directly be used to create records, even if the full matching
+     * was unsuccessful
+     */
     function tryMatch() {
-      // returns a {success, list of assignments}
       let assignments = [];
       let remaining = new Set(records.map((r) => {
         return {
@@ -119,7 +152,7 @@ export function Matcher() {
         current = next;
       }
 
-      // and complete the loop, if the groups match up
+      // Now complete the loop, assign the last person to the first (but only if the groups match up)
       if (current.group === first.group) {
         return {success: false, assignments};
       }
@@ -132,7 +165,7 @@ export function Matcher() {
       return {success: true, assignments};
     }
 
-    // It may not be possible, but try 5 times
+    // Try up to 5 times, or until we get a complete/successful match
     var retries = 0;
     while (retries++ < 5) {
       const {success, assignments} = tryMatch();
@@ -160,26 +193,13 @@ export function Matcher() {
     setTimeout(() => setShakePresent(false), 1000);
   }
 
-
   return (<Box display="flex" flex="auto" alignItems="flex-start" justifyContent="center">
     <Box
-      flex="none"
-      display="flex"
-      flexDirection="column"
-      width="200px"
-      backgroundColor="white"
-      height="100%"
-      borderRight="thick"
-    >
+      flex="none" display="flex" flexDirection="column"
+      width="200px" height="100%" backgroundColor="white" borderRight="thick">
       <Box
-        flex="auto"
-        display="flex"
-        flexDirection="column"
-        minHeight="0"
-        padding={3}
-        overflowY="auto"
-        alignItems="center"
-      >
+        flex="auto" display="flex" flexDirection="column" alignItems="center"
+        minHeight="0" padding={3} overflowY="auto">
         <Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch}>
           Make Match
         </Button>
