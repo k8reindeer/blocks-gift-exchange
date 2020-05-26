@@ -133,7 +133,7 @@ export function Matcher() {
       let remaining = new Set(records.map((r) => {
         return {
           id: r.id,
-          group: settings.assignmentField && r.getCellValue(settings.groupField.id).id
+          group: settings.groupField && r.getCellValue(settings.groupField.id).id
         }
       }));
 
@@ -141,7 +141,11 @@ export function Matcher() {
       remaining.delete(first);
       let current = first
       while (remaining.size > 0) {
-        const possibleNext = Array.from(remaining).filter((x) => x.group != current.group)
+        const possibleNext = Array.from(remaining).filter((x) => {
+          // if the current record isn't in a group, anything goes.
+          // Otherwise filter to only those nodes that are in a different group
+          return !current.group || x.group != current.group
+        })
         if (possibleNext.length === 0) {
           // We've hit a dead end
           return {success: false, assignments};
@@ -158,7 +162,7 @@ export function Matcher() {
       }
 
       // Now complete the loop, assign the last person to the first (but only if the groups match up)
-      if (current.group === first.group) {
+      if (current.group && first.group && current.group === first.group) {
         return {success: false, assignments};
       }
       assignments.push({
