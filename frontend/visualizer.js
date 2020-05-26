@@ -1,6 +1,7 @@
 import {
   expandRecord,
   useRecords,
+  colors,
   colorUtils, 
   useViewport
 } from '@airtable/blocks/ui';
@@ -67,7 +68,8 @@ export function Visualizer() {
         'text-valign': 'center',
         'text-halign': 'center',
         'shape': 'ellipse',
-        'padding': '8px'
+        'padding': '8px',
+        'background-color': colorUtils.getHexForColor(colors.GRAY_LIGHT_2)
       }
     },
     {
