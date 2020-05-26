@@ -26,6 +26,12 @@ export function Visualizer() {
   const viewport = useViewport();
   var layoutInstance;
 
+  useEffect(() => {
+    if (layoutInstance) {
+      layoutInstance.run();
+    }
+  }, [records, layoutInstance])
+
   let elements = [];
   if (!records) {
     return null;
@@ -47,12 +53,6 @@ export function Visualizer() {
       elements.push({ data: { source: r.id, target: a.id } })
     }
   }
-
-  useEffect(() => {
-    if (layoutInstance) {
-      layoutInstance.run();
-    }
-  }, [records])
 
   let style = [
     {
