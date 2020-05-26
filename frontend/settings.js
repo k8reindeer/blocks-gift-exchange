@@ -5,7 +5,6 @@ import {
   FieldPickerSynced,
   FormField,
   Heading,
-  Icon,
   TablePickerSynced,
   ViewPickerSynced,
   useBase,

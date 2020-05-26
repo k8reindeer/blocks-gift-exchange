@@ -4,10 +4,8 @@ import {
   colorUtils,
   colors,
   ConfirmationDialog,
-  expandRecord,
   Icon,
   Text,
-  TextButton,
   useRecords,
 } from '@airtable/blocks/ui';
 import React, {useState} from 'react';

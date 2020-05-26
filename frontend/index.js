@@ -3,13 +3,12 @@ import {
   Box,
   colors,
   colorUtils,
-  expandRecord,
   Icon,
   loadCSSFromURLAsync,
   Text,
   Tooltip
 } from '@airtable/blocks/ui';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Matcher} from './matcher';
 import {useSettings, SettingsForm} from './settings';
 

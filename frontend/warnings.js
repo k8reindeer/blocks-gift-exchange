@@ -42,14 +42,14 @@ function RecordLink({record}) {
 function Warning({type, giver, recipient}) {
   switch(type) {
     case WarningType.NO_ASSIGNMENT:
-      return <><RecordLink record={giver}/> isn't assigned to give to anyone </>
+      return <><RecordLink record={giver}/> isn&apos;t assigned to give to anyone </>
     case WarningType.MULTIPLE_ASSIGNMENTS:
       return <><RecordLink record={giver}/> is assigned to give to multiple people </>
     case WarningType.SELF_ASSIGNMENT:
       return <><RecordLink record={giver}/> is assigned to themself!</>
     case WarningType.SAME_GROUP_ASSIGNMENT:
       return (<>
-        <RecordLink record={giver}/> is assigned to <RecordLink record={recipient}/> but they're both in the same group.
+        <RecordLink record={giver}/> is assigned to <RecordLink record={recipient}/> but they&apos;re both in the same group.
       </>)
     case WarningType.NO_GIVERS:
       return <>Nobody is assigned to give to <RecordLink record={recipient}/></>
