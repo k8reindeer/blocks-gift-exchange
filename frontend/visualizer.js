@@ -41,7 +41,10 @@ export function Visualizer() {
     let nodeData = { id: r.id, label: r.name }
     if (settings.groupField) {
       // If groups are being used, specify which group (used for color coding)
-      nodeData['group'] = r.getCellValue(settings.groupField.id).id;
+      const group = r.getCellValue(settings.groupField.id)
+      if (group) {
+        nodeData['group'] = group.id;
+      }
     }
     elements.push({data: nodeData})
 

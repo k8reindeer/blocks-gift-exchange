@@ -71,7 +71,8 @@ function useValidateMatch(records) {
           warnings.push({type: WarningType.INVALID_ASSIGNMENT, giver: r})
         } else {
           const myGroup = r.getCellValue(settings.groupField.id);
-          if (myGroup.id === assignment.getCellValue(settings.groupField.id).id) {
+          const assignmentGroup = assignment.getCellValue(settings.groupField.id)
+          if (myGroup && assignmentGroup && myGroup.id === assignmentGroup.id) {
             warnings.push({type: WarningType.SAME_GROUP_ASSIGNMENT, giver: r, recipient: assignment});
           }
         }
@@ -131,9 +132,10 @@ export function Matcher() {
     function tryMatch() {
       let assignments = [];
       let remaining = new Set(records.map((r) => {
+        const group = settings.groupField && r.getCellValue(settings.groupField.id)
         return {
           id: r.id,
-          group: settings.groupField && r.getCellValue(settings.groupField.id).id
+          group: group && group.id
         }
       }));
 
