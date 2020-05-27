@@ -158,6 +158,7 @@ export function SettingsForm() {
                 table={settings.table}
                 globalConfigKey={ConfigKeys.GROUP_FIELD_ID}
                 allowedTypes={[FieldType.SINGLE_SELECT]}
+                shouldAllowPickingNone={true}
               />
             </FormField>
           </>

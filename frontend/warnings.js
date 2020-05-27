@@ -67,19 +67,15 @@ function Warning({type, giver, recipient}) {
  * Renders a list of warning messages in a scollable box
  */
 export function WarningsList({warnings}) {
-  return(
-    <Box
-      flex="auto" display="flex" flexDirection="column" 
-      alignItems="flex-start" minHeight="0"
-     >
-    <Text>
+  return(<>
+    <Text flex="0 1 auto" alignSelf="flex-start">
       <Icon 
         name="warning" size={16} marginX={2} 
         fillColor={colorUtils.getHexForColor(colors.YELLOW_BRIGHT)}  
       />
       There are {warnings.length} issues
     </Text>
-    <Box marginY={2} overflowY="scroll" maxHeight="100vh" backgroundColor="lightGray3">
+    <Box flex="0 1 auto" marginY={2} overflowY="scroll" maxHeight="80vh" backgroundColor="lightGray3">
       {warnings.map((w, i) => {
         return (
           <Box key={i} margin={2} padding={1} borderRadius={2} backgroundColor="white">
@@ -88,5 +84,5 @@ export function WarningsList({warnings}) {
         )
       })}
     </Box>
-  </Box>)
+  </>)
 }
