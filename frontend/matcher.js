@@ -8,6 +8,7 @@ import {
   Text,
   Tooltip,
   useRecords,
+  useViewport
 } from '@airtable/blocks/ui';
 import React, {useState} from 'react';
 import {Visualizer} from './visualizer';
@@ -104,6 +105,7 @@ export function Matcher() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isVisualizationOpen, setIsVisualizationOpen] = useState(false);
   const [shakePresent, setShakePresent] = useState(false);
+  const viewport = useViewport();
 
   const records = useRecords(settings.view);
   const {isMatchValid, warnings} = useValidateMatch(records);
@@ -208,45 +210,42 @@ export function Matcher() {
     setTimeout(() => setShakePresent(false), 1000);
   }
 
+  const height = `${viewport.size.height}px`;
   return (<Box display="flex" flex="auto" alignItems="flex-start" justifyContent="center">
     <Box
-      flex="none" display="flex" flexDirection="column"
-      width="200px" height="100%" backgroundColor="white" borderRight="thick">
-      <Box
-        flex="auto" display="flex" flexDirection="column" alignItems="center"
-        minHeight="0" padding={3} overflowY="auto">
-        <Tooltip
-          content={reasonDisplayString}
-          placementX={Tooltip.placements.RIGHT}
-          placementY={Tooltip.placements.CENTER}
-        >
-          <Box>
-            <Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch} disabled={!hasPermission}>
-              Make Match
-            </Button>
-          </Box>
-        </Tooltip>
-        {isMatchValid ?
-          <>
-            <Icon
-              className={shakePresent ?  "animate__animated animate__tada" : ""}
-              name="gift" onMouseEnter={wigglePresent}
-              margin={3} size={64} fillColor={colorUtils.getHexForColor(colors.RED)}
-            />
-            <Text textAlign="center">
-              Success! A perfect gift assignment is stored in the <strong>{settings.assignmentField.name}</strong> field!
-            </Text>
-          </> :
-          <>
-            {areAssignmentsEmpty ?
-            <Text> No assignments yet. Click above to make a match!</Text> :
-            <WarningsList warnings={warnings}/>}
-          </>
-        }
-        <Button margin={3} onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}>
-          {isVisualizationOpen ? "Hide Visualiation" : "Show Visualization"}
-        </Button>
-      </Box>
+      flex="none" display="flex" flexDirection="column" alignItems="center" padding={3}
+      width="200px" height={height} backgroundColor="white" borderRight="thick" overflowY="auto">
+      <Tooltip
+        content={reasonDisplayString}
+        placementX={Tooltip.placements.RIGHT}
+        placementY={Tooltip.placements.CENTER}
+      >
+        <Box>
+          <Button icon="share" variant="primary" margin={3} onClick={safeMakeMatch} disabled={!hasPermission}>
+            Make Match
+          </Button>
+        </Box>
+      </Tooltip>
+      {isMatchValid ?
+        <>
+          <Icon
+            className={shakePresent ?  "animate__animated animate__tada" : ""}
+            name="gift" onMouseEnter={wigglePresent}
+            margin={3} size={64} fillColor={colorUtils.getHexForColor(colors.RED)}
+          />
+          <Text textAlign="center">
+            Success! A perfect gift assignment is stored in the <strong>{settings.assignmentField.name}</strong> field!
+          </Text>
+        </> :
+        <>
+          {areAssignmentsEmpty ?
+          <Text> No assignments yet. Click above to make a match!</Text> :
+          <WarningsList warnings={warnings}/>}
+        </>
+      }
+      <Button margin={3} onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}>
+        {isVisualizationOpen ? "Hide Visualiation" : "Show Visualization"}
+      </Button>
     </Box>
     <Box flex="auto">
       {isVisualizationOpen && <Visualizer/>}
