@@ -181,11 +181,23 @@ export function Matcher() {
       return {success: true, assignments};
     }
 
+    // Why would you have a gift exchange with more than 50 people?
+    // Well, guess we better support it if there's, like, 51
+    async function batchedUpdateRecords(records) {
+      const BATCH_SIZE = 50;
+      let i = 0;
+      while (i < records.length) {
+          const recordBatch = records.slice(i, i + BATCH_SIZE);
+          await settings.table.updateRecordsAsync(recordBatch);
+          i += BATCH_SIZE;
+      }
+    }
+
     // Try up to 5 times, or until we get a complete/successful match
     var retries = 0;
     while (retries++ < 5) {
       const {success, assignments} = tryMatch();
-      await settings.table.updateRecordsAsync(assignments);
+      await batchedUpdateRecords(assignments);
       if (success) {
         wigglePresent();
         break;
