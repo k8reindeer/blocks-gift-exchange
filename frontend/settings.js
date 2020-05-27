@@ -49,13 +49,22 @@ export function useSettings() {
   // If there's literally nothing in globalConfig, we haven't set any settings yet...
   // Try to set some sensible defaults
   if (allKeysUnset(globalConfig)) {
-    console.log("its empty");
     // Get the active table and view. Don't use watchable because this happens only once
-    const updates = [
+    let updates = [
       {path: [ConfigKeys.TABLE_ID], value: cursor.activeTableId},
       {path: [ConfigKeys.VIEW_ID], value: cursor.activeViewId},
     ];
-    console.log(updates)
+    const table = base.getTableByIdIfExists(cursor.activeTableId);
+    if (table) {
+      // Find a field of the correct type to be assignment field
+      const candidateFields = table.fields.filter((f) => {
+        return (f.type === FieldType.MULTIPLE_RECORD_LINKS &&
+          f.options.linkedTableId === table.id);
+      })
+      if (candidateFields.length > 0) {
+        updates.push({path: [ConfigKeys.ASSIGNMENT_FIELD_ID], value: candidateFields[0].id})
+      }
+    }
     if (globalConfig.hasPermissionToSetPaths(updates)) {
       globalConfig.setPathsAsync(updates);
     }
