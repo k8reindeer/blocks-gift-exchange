@@ -2,10 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {
   Box,
   Button,
+  colors,
+  colorUtils,
   FieldPickerSynced,
   FormField,
   Heading,
+  Icon,
   TablePickerSynced,
+  Text,
   ViewPickerSynced,
   useBase,
   useGlobalConfig,
@@ -61,8 +65,8 @@ export function useSettings() {
     };
   }
 
-  if (!table) return invalid('Pick a table for assignment');
-  if (!view) return invalid('Pick a view for assignment');
+  if (!table) return invalid('Pick a table');
+  if (!view) return invalid('Pick a view');
   if (!assignmentField) return invalid('Pick a field to save assignments');
   if (assignmentField.type != FieldType.MULTIPLE_RECORD_LINKS) 
     return invalid('Assignment field must be a link field');
@@ -85,7 +89,7 @@ export function useSettings() {
 export function SettingsForm() {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [settingsLeaving, setSettingsLeaving] = useState(false);
-  const {areSettingsValid, settings} = useSettings();
+  const {areSettingsValid, settings, message} = useSettings();
 
   // Open the SettingsForm whenever the settings are not valid
   useEffect(() => {
@@ -165,10 +169,16 @@ export function SettingsForm() {
         )}
       </Box>
       <Box
-        flex="none" display="flex" justifyContent="flex-end"
-        paddingY={3} marginX={3} borderTop="thick"
+        flex="none" display="flex" justifyContent={areSettingsValid ? "flex-end" : "space-between"}
+        alignItems="center" paddingY={3} marginX={3} borderTop="thick"
       >
-        <Button variant="primary" size="large" onClick={closeSettings}>
+        {!areSettingsValid && <Text textColor="light">
+          <Icon name="warning" size={16} marginX={2}
+            fillColor={colorUtils.getHexForColor(colors.ORANGE_BRIGHT)}/>
+          {message}
+        </Text>}
+        <Button variant="primary" size="large" onClick={closeSettings}
+          disabled={!areSettingsValid}>
           Done
         </Button>
       </Box>
