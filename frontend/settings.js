@@ -15,6 +15,7 @@ import {
   useGlobalConfig,
   useSettingsButton
 } from '@airtable/blocks/ui';
+import {cursor} from '@airtable/blocks';
 import {FieldType} from '@airtable/blocks/models';
 
 export const ConfigKeys = Object.freeze({
@@ -23,6 +24,11 @@ export const ConfigKeys = Object.freeze({
   ASSIGNMENT_FIELD_ID: 'assignmentFieldId',
   GROUP_FIELD_ID: 'groupFieldId'
 });
+
+
+function allKeysUnset(globalConfig) {
+  return Object.values(ConfigKeys).every((k) => globalConfig.get(k) === undefined);
+}
 
 /**
  * A React hook to validate and access settings configured in SettingsForm.
@@ -39,6 +45,21 @@ export const ConfigKeys = Object.freeze({
 export function useSettings() {
   const base = useBase();
   const globalConfig = useGlobalConfig();
+
+  // If there's literally nothing in globalConfig, we haven't set any settings yet...
+  // Try to set some sensible defaults
+  if (allKeysUnset(globalConfig)) {
+    console.log("its empty");
+    // Get the active table and view. Don't use watchable because this happens only once
+    const updates = [
+      {path: [ConfigKeys.TABLE_ID], value: cursor.activeTableId},
+      {path: [ConfigKeys.VIEW_ID], value: cursor.activeViewId},
+    ];
+    console.log(updates)
+    if (globalConfig.hasPermissionToSetPaths(updates)) {
+      globalConfig.setPathsAsync(updates);
+    }
+  }
 
   const table = base.getTableByIdIfExists(globalConfig.get(ConfigKeys.TABLE_ID));
   const view = table ? table.getViewByIdIfExists(globalConfig.get(ConfigKeys.VIEW_ID)) : null;
