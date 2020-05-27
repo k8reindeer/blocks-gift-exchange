@@ -66,6 +66,8 @@ export function useSettings() {
   if (!assignmentField) return invalid('Pick a field to save assignments');
   if (assignmentField.type != FieldType.MULTIPLE_RECORD_LINKS) 
     return invalid('Assignment field must be a link field');
+  if (assignmentField.options.linkedTableId != table.id)
+    return invalid(`Assignment field must link to ${table.name} table`);
   if (groupField && groupField.type != FieldType.SINGLE_SELECT) 
     return invalid('Group field must be a single select field');
 
