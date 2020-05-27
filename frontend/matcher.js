@@ -107,7 +107,10 @@ export function Matcher() {
   const [shakePresent, setShakePresent] = useState(false);
   const viewport = useViewport();
 
-  const records = useRecords(settings.view);
+  const opts = {
+    fields: [settings.assignmentField, settings.groupField]
+  };
+  const records = useRecords(settings.view, opts);
   const {isMatchValid, warnings} = useValidateMatch(records);
 
   async function makeMatch() {

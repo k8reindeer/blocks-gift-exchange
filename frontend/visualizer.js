@@ -23,7 +23,10 @@ cytoscape.use( avsdf );
  */
 export function Visualizer() {
   const {settings} = useSettings();
-  const records = useRecords(settings.view);
+  const opts = {
+    fields: [settings.assignmentField, settings.groupField]
+  };
+  const records = useRecords(settings.view, opts);
   const viewport = useViewport();
   var layoutInstance;
 
