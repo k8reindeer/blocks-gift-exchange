@@ -27,7 +27,7 @@ export const WarningType = Object.freeze({
 function RecordLink({record}) {
   return (
     <TextButton onClick={() => expandRecord(record)}>
-      {record.name}
+      {record.name || 'Unnamed Record'}
     </TextButton>
   )
 }

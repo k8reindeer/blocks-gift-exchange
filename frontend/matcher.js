@@ -136,6 +136,9 @@ export function Matcher() {
      */
     function tryMatch() {
       let assignments = [];
+      if (records.length === 0) {
+        return {success: true, assignments};
+      }
       let remaining = new Set(records.map((r) => {
         const group = settings.groupField && r.getCellValue(settings.groupField.id)
         return {

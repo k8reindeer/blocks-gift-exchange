@@ -41,7 +41,7 @@ export function Visualizer() {
     return null;
   }
   for (let r of records) {
-    let nodeData = { id: r.id, label: r.name }
+    let nodeData = { id: r.id, label: r.name || 'Unnamed record'}
     if (settings.groupField) {
       // If groups are being used, specify which group (used for color coding)
       const group = r.getCellValue(settings.groupField.id)
@@ -103,7 +103,9 @@ export function Visualizer() {
     }
   }
 
-  const layout = { name: 'avsdf', randomize: false, refresh: 30, nodeSeparation: 90};
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const layout = { name: 'avsdf', randomize: false, refresh: 30, nodeSeparation: 90, animate: mediaQuery.matches ? false : 'end'};
   const width = viewport.size.width-200
 
   return (<>
