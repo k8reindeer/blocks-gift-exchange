@@ -262,7 +262,7 @@ export function Matcher() {
         </>
       }
       <Button margin={3} onClick={() => setIsVisualizationOpen(!isVisualizationOpen)}>
-        {isVisualizationOpen ? "Hide Visualiation" : "Show Visualization"}
+        {isVisualizationOpen ? "Hide Visualization" : "Show Visualization"}
       </Button>
     </Box>
     <Box flex="auto">
